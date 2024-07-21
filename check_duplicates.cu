@@ -23,4 +23,34 @@ __global__ void checkDuplicatesKernel(FileEntry** fileEntries, int numFiles, int
     }
 }
 
-extern "C" void CheckDuplicatesWithCuda(FileEntry** fileEntries, int
+extern "C" void CheckDuplicatesWithCuda(char** fileNames, int numFiles) {
+
+    char** d_fileNames;
+
+    int* d_duplicateFlags;
+
+    int* h_duplicateFlags = (int*)malloc(numFiles * sizeof(int));
+
+    memset(h_duplicateFlags, 0, numFiles * sizeof(int));
+
+
+
+    cudaMalloc((void**)&d_fileNames, numFiles * sizeof(char*));
+
+    cudaMalloc((void**)&d_duplicateFlags, numFiles * sizeof(int));
+
+    cudaMemcpy(d_fileNames, fileNames, numFiles * sizeof(char*), cudaMemcpyHostToDevice);
+
+    cudaMemcpy(d_duplicateFlags, h_duplicateFlags, numFiles * sizeof(int), cudaMemcpyHostToDevice);
+
+
+
+    int blockSize = 256;
+
+    int numBlocks = (numFiles + blockSize - 1) / blockSize;
+
+
+    /// TODO: FIX THIS
+    checkDuplicatesKernel
+
+}

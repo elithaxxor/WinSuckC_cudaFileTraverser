@@ -29,6 +29,7 @@ void printStringArray(char* arr[], int size)
 void SaveBinaryContentToHashmap(const char* folderPath, FileEntry** fileBinary);
 
 extern "C" void CheckDuplicatesWithCuda(char** fileNames, int numFiles);
+extern "C" void CheckDuplicateBinaryWithCuda(char** fileBinaries, int numBinary);
 
 int main() {
     char folderPath[MAX_PATH];
@@ -80,7 +81,7 @@ int main() {
         printf(" [!] PROCESSING:  \"%s\"\n", fileNames[i]);
         i++;
     }
-    printf("%d [+] numfiles: \n", numFiles);
+    printf("%d [+] processed numfiles: \n", numFiles);
 
 
     // TODO: -->Collect file BINARYS into an array for CUDA processing
@@ -96,13 +97,14 @@ int main() {
         printf(" [!] PROCESSING:  \"%s\"\n", fileBinaries[i]);
         i++;
     }
-    printf("%d [+] numBinary: \n", numBinary);
+    printf("%d [+] processed numBinary: \n", numBinary);
 
-
-    // Check for duplicates using CUDA
-    CheckDuplicatesWithCuda(fileNames, numFiles);
 
     // TODO: MAKE FUNCTION TO CHECK DUPLICATE BINARIES WITH CUDA
+    // Check for duplicates using CUDA
+    CheckDuplicatesWithCuda(fileNames, numFiles);
+    CheckDuplicateBinaryWithCuda(fileBinaries, numBinary);
+
 
     // Free the array
     free(fileNames);
