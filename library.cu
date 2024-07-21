@@ -19,14 +19,21 @@ typedef struct {
     UT_hash_handle hh;        // makes this structure hashable
 } FileEntry;
 
+typedef struct {
+    char fileName[MAX_PATH];  // key
+    UT_hash_handle hh;        // makes this structure hashable
+} HashEntry;
+
 void ListFilesInDirectory(const char* folderPath);
 void PrintFilesToFile(const char* folderPath, const char* outputFilePath);
 void SaveFilesToHashmap(const char* folderPath, FileEntry** fileMap);
 void CheckDuplicatesInHashmap(FileEntry* fileMap);
 void FreeHashmap(FileEntry* fileMap);
-void FreeBinaryHashmap(FileEntry* fileBinary);
+void FreeBinaryHashmap(HashEntry* fileBinary);
 void printStringArray(char* arr[], int size)
-void SaveBinaryContentToHashmap(const char* folderPath, FileEntry** fileBinary);
+
+
+void SaveBinaryContentToHashmap(const char* folderPath, HashEntry** fileBinary);
 
 extern "C" void CheckDuplicatesWithCuda(char** fileNames, int numFiles);
 extern "C" void CheckDuplicateBinaryWithCuda(char** fileBinaries, int numBinary);
@@ -88,7 +95,7 @@ int main() {
     // TODO: CREATE CUDA TO PROCESS BINARIES
     int numBinary = HASH_COUNT(fileBinary);
     char** fileBinaries = (char**)malloc(numBinary * sizeof(char*)); // allocate the memory to be stored
-    FileEntry* currentBinary;
+    HashEntry* currentBinary;
     int i = 0;
 
     printf("[!] Collect FILE BINARIES  into an array for CUDA processing\n %d numBinary: \n", numBinary);
@@ -252,7 +259,7 @@ void CheckDuplicatesInHashmap(FileEntry* fileMap) {
     FreeHashmap(duplicateMap);
 }
 
-void SaveBinaryContentToHashmap(const char* folderPath, FileEntry** fileMap) {
+void SaveBinaryContentToHashmap(const char* folderPath, HashEntry** fileMap) {
     WIN32_FIND_DATA findFileData;
     HANDLE hFind = INVALID_HANDLE_VALUE;
 
@@ -280,7 +287,7 @@ void SaveBinaryContentToHashmap(const char* folderPath, FileEntry** fileMap) {
                 continue;
             }
 
-            FileEntry* newEntry = (FileEntry*)malloc(sizeof(FileEntry));
+            HashEntry* newEntry = (HashEntry*)malloc(sizeof(HashEntry));
             if (newEntry == NULL) {
                 printf("Error: Memory allocation failed\n");
                 free(content);
@@ -306,9 +313,9 @@ void FreeHashmap(FileEntry* fileMap) {
         free(currentFile);
     }
 }
-void FreeBinaryHashmap(FileEntry* fileBinary){
-    FileEntry* currentFile;
-    FileEntry* tmp;
+void FreeBinaryHashmap(HashEntry* fileBinary){
+    HashEntry* currentFile;
+    HashEntry* tmp;
 
     HASH_ITER(hh, fileBinary, currentFile, tmp) {
         HASH_DEL(fileBinary, currentFile);

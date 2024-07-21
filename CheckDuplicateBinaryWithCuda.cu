@@ -8,9 +8,9 @@ typedef struct {
     unsigned char* content;   // file content
     size_t contentSize;       // size of content
     UT_hash_handle hh;        // makes this structure hashable
-} FileEntry;
+} HashEntry;
 
-__global__ void checkDuplicatesBinaryKernel(FileEntry** fileEntries, int numBinary, int* duplicateFlags) {
+__global__ void checkDuplicatesBinaryKernel(HashEntry** fileEntries, int numBinary, int* duplicateFlags) {
  int idx = blockIdx.x * blockDim.x + threadIdx.x;
     if (idx < numBinary) {
         for (int j = idx + 1; j < numBinary; ++j) {
@@ -23,7 +23,7 @@ __global__ void checkDuplicatesBinaryKernel(FileEntry** fileEntries, int numBina
     }
 }
 
-extern "C" void CheckDuplicateBinaryWithCuda(FileEntry** fileEntries, int numBinary) {
+extern "C" void CheckDuplicateBinaryWithCuda(HashEntry** fileEntries, int numBinary) {
 
     char** d_fileNames;
     int* d_duplicateFlags;
