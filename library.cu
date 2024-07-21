@@ -10,9 +10,6 @@
 
 // ### NOTE:: NVIDIA USES 'nvcc' compiler- ex: nvcc helloworld.cu -o hello.out
 
-
-
-
 /// NOTE:  THE STRUCT TO HANDLE WINDOW FILES--> 'fileName' creates a unique key, and the struct  is Hashable. The program will refer to 'fileName' throughout its execution.
 typedef struct {
     char fileName[MAX_PATH];  // key
