@@ -12,6 +12,8 @@
 
 
 
+
+///
 typedef struct {
     char fileName[MAX_PATH];  // key
     UT_hash_handle hh;        // makes this structure hashable
@@ -22,6 +24,7 @@ void PrintFilesToFile(const char* folderPath, const char* outputFilePath);
 void SaveFilesToHashmap(const char* folderPath, FileEntry** fileMap);
 void CheckDuplicatesInHashmap(FileEntry* fileMap);
 void FreeHashmap(FileEntry* fileMap);
+void printStringArray(char* arr[], int size)
 
 extern "C" void CheckDuplicatesWithCuda(char** fileNames, int numFiles);
 
@@ -29,8 +32,8 @@ int main() {
     char folderPath[MAX_PATH];
     char outputFilePath[MAX_PATH];
 
-    printf("Enter the folder path: ");
-    fgets(folderPath, MAX_PATH, stdin);
+    printf("Enter the folder path to traverse: ");
+    fgets(folderPath, MAX_PATH, stdin); // 1. OUTPUT FP. 2. THE UNIQUE KEY. 3 THE PIPE
 
     // Remove the newline character at the end if it exists
     size_t len = strlen(folderPath);
@@ -39,13 +42,15 @@ int main() {
     }
 
     printf("Enter the output file path (e.g., C:\\output.txt): ");
-    fgets(outputFilePath, MAX_PATH, stdin);
+    fgets(outputFilePath, MAX_PATH, stdin); // 1. OUTPUT FP. 2. THE UNIQUE KEY. 3 THE PIPE
+
 
     // Remove the newline character at the end if it exists
     len = strlen(outputFilePath);
     if (outputFilePath[len - 1] == '\n') {
         outputFilePath[len - 1] = '\0';
     }
+
 
     ListFilesInDirectory(folderPath);
     PrintFilesToFile(folderPath, outputFilePath);
@@ -59,10 +64,21 @@ int main() {
     char** fileNames = (char**)malloc(numFiles * sizeof(char*));
     FileEntry* currentFile;
     int i = 0;
+
+    printf("[!] Collect file names into an array for CUDA processing\n %d numfiles: \n", numFiles);
+    /// NOTE: PIPES THE CURRENT FILE INTO DEFINED STRUCT 'fileName'
     for (currentFile = fileMap; currentFile != NULL; currentFile = currentFile->hh.next) {
         fileNames[i] = currentFile->fileName;
+        printf(" [!] PROCESSING:  \"%s\"\n", fileNames[i]);
         i++;
     }
+    printf("%d [+] numfiles: \n", numFiles);
+
+//    int size = sizeof(fileNames) / sizeof(fileNames[0]);
+//    printStringArray(stringArray, size);
+
+
+
 
     // Check for duplicates using CUDA
     CheckDuplicatesWithCuda(fileNames, numFiles);
@@ -219,4 +235,14 @@ void FreeHashmap(FileEntry* fileMap) {
         HASH_DEL(fileMap, currentFile);
         free(currentFile);
     }
+}
+
+
+void printStringArray(char* arr[], int size) {
+    printf("String Array: [\n");
+    for (int i = 0; i < size; i++) {
+        // Print each string with quotation marks and on a new line
+        printf("  \"%s\"\n", arr[i]);
+    }
+    printf("]\n");
 }
