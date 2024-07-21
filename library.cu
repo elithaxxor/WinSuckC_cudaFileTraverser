@@ -24,6 +24,7 @@ void PrintFilesToFile(const char* folderPath, const char* outputFilePath);
 void SaveFilesToHashmap(const char* folderPath, FileEntry** fileMap);
 void CheckDuplicatesInHashmap(FileEntry* fileMap);
 void FreeHashmap(FileEntry* fileMap);
+void FreeBinaryHashmap(FileEntry* fileBinary);
 void printStringArray(char* arr[], int size)
 void SaveBinaryContentToHashmap(const char* folderPath, FileEntry** fileBinary);
 
@@ -62,16 +63,19 @@ int main() {
 
     // NOTE: 1. (SaveFilesToHashmap) SAVES 'FILE NAMES' TO HASHMAP FOR UNIQUE PARSING.
     // NOTE: 2. (SaveBinaryContentToHashmap) SEARCHES FP AND SAVES BINARY TO CONTENT TO HASHMAP FOR UNIQUE PARSING.
-    // TODO: CREATE FUNCTION TO FIT INSIDE (SaveFilesToHashmap) (SaveBinaryContentToHashmap) TO PRINT AND SAVE OUTUT
     SaveFilesToHashmap(folderPath, &fileMap);
     SaveBinaryContentToHashmap(folderPath, &fileBinary)
 
 
-    // Collect file names into an array for CUDA processing
+    // NOTE: 1. -->Collect file names into an array for CUDA processing
     int numFiles = HASH_COUNT(fileMap);
     char** fileNames = (char**)malloc(numFiles * sizeof(char*));
     FileEntry* currentFile;
     int i = 0;
+
+    // TODO: -->Collect file BINARYS into an array for CUDA processing
+    // TODO: CREATE CUDA TO PROCESS BINARIES
+
 
     printf("[!] Collect file names into an array for CUDA processing\n %d numfiles: \n", numFiles);
     /// NOTE: PIPES THE CURRENT FILE INTO DEFINED STRUCT 'fileName'
@@ -96,6 +100,8 @@ int main() {
 
     // Free hashmap
     FreeHashmap(fileMap);
+
+    FreeBinaryHashMap(fileBinary);
 
     return 0;
 }
@@ -286,6 +292,15 @@ void FreeHashmap(FileEntry* fileMap) {
 
     HASH_ITER(hh, fileMap, currentFile, tmp) {
         HASH_DEL(fileMap, currentFile);
+        free(currentFile);
+    }
+}
+void FreeBinaryHashmap(FileEntry* fileBinary){
+    FileEntry* currentFile;
+    FileEntry* tmp;
+
+    HASH_ITER(hh, fileBinary, currentFile, tmp) {
+        HASH_DEL(fileBinary, currentFile);
         free(currentFile);
     }
 }
