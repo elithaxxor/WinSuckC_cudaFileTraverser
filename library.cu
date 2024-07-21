@@ -73,10 +73,6 @@ int main() {
     FileEntry* currentFile;
     int i = 0;
 
-    // TODO: -->Collect file BINARYS into an array for CUDA processing
-    // TODO: CREATE CUDA TO PROCESS BINARIES
-
-
     printf("[!] Collect file names into an array for CUDA processing\n %d numfiles: \n", numFiles);
     /// NOTE: PIPES THE CURRENT FILE INTO DEFINED STRUCT 'fileName'
     for (currentFile = fileMap; currentFile != NULL; currentFile = currentFile->hh.next) {
@@ -86,14 +82,27 @@ int main() {
     }
     printf("%d [+] numfiles: \n", numFiles);
 
-//    int size = sizeof(fileNames) / sizeof(fileNames[0]);
-//    printStringArray(stringArray, size);
 
+    // TODO: -->Collect file BINARYS into an array for CUDA processing
+    // TODO: CREATE CUDA TO PROCESS BINARIES
+    int numBinary = HASH_COUNT(fileBinary);
+    char** fileBinaries = (char**)malloc(numBinary * sizeof(char*)); // allocate the memory to be stored
+    FileEntry* currentBinary;
+    int i = 0;
 
+    printf("[!] Collect FILE BINARIES  into an array for CUDA processing\n %d numBinary: \n", numBinary);
+    for (currentBinary = fileMap; currentBinary != NULL; currentBinary = currentBinary->hh.next) {
+        fileBinaries[i] = currentBinary->fileName;
+        printf(" [!] PROCESSING:  \"%s\"\n", fileBinaries[i]);
+        i++;
+    }
+    printf("%d [+] numBinary: \n", numBinary);
 
 
     // Check for duplicates using CUDA
     CheckDuplicatesWithCuda(fileNames, numFiles);
+
+    // TODO: MAKE FUNCTION TO CHECK DUPLICATE BINARIES WITH CUDA
 
     // Free the array
     free(fileNames);
