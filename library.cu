@@ -26,7 +26,7 @@ void PrintFilesToFile(const char* folderPath, const char* outputFilePath);
 void SaveFilesToHashmap(const char* folderPath, FileEntry** fileMap);
 void CheckDuplicatesInHashmap(FileEntry* fileMap);
 void FreeHashmap(FileEntry* fileMap);
-void FreeBinaryHashmap(HashEntry* fileBinary);
+void FreeBinaryHashMap(HashEntry* fileBinary);
 void printStringArray(char* arr[], int size)
 
 
@@ -96,7 +96,7 @@ int main() {
     int i = 0;
 
     printf("[!] Collect FILE BINARIES  into an array for CUDA processing\n %d numBinary: \n", numBinary);
-    for (currentBinary = fileMap; currentBinary != NULL; currentBinary = currentBinary->hh.next) {
+    for (currentBinary = fileBinary; currentBinary != NULL; currentBinary = currentBinary->hh.next) {
         fileBinaries[i] = currentBinary->fileName;
         printf(" [!] PROCESSING:  \"%s\"\n", fileBinaries[i]);
         i++;
@@ -310,7 +310,7 @@ void FreeHashmap(FileEntry* fileMap) {
         free(currentFile);
     }
 }
-void FreeBinaryHashmap(HashEntry* fileBinary){
+void FreeBinaryHashMap(HashEntry* fileBinary){
     HashEntry* currentFile;
     HashEntry* tmp;
 
