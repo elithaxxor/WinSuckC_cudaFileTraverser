@@ -13,7 +13,7 @@
 
 
 
-///
+/// NOTE:  THE STRUCT TO HANDLE WINDOW FILES--> 'fileName' creates a unique key, and the struct  is Hashable. The program will refer to 'fileName' throughout its execution.
 typedef struct {
     char fileName[MAX_PATH];  // key
     UT_hash_handle hh;        // makes this structure hashable
@@ -25,6 +25,7 @@ void SaveFilesToHashmap(const char* folderPath, FileEntry** fileMap);
 void CheckDuplicatesInHashmap(FileEntry* fileMap);
 void FreeHashmap(FileEntry* fileMap);
 void printStringArray(char* arr[], int size)
+void SaveBinaryContentToHashmap(const char* folderPath, FileEntry** fileBinary);
 
 extern "C" void CheckDuplicatesWithCuda(char** fileNames, int numFiles);
 
@@ -52,12 +53,19 @@ int main() {
     }
 
 
+    /// NOTE: block to takecare of 'FILENAMES' and 'FILE-BINARAY'
     ListFilesInDirectory(folderPath);
     PrintFilesToFile(folderPath, outputFilePath);
-
-    // Save files to hashmap
     FileEntry* fileMap = NULL;
+    FileBinary* fileBinary = NULL;
+
+
+    // NOTE: 1. (SaveFilesToHashmap) SAVES 'FILE NAMES' TO HASHMAP FOR UNIQUE PARSING.
+    // NOTE: 2. (SaveBinaryContentToHashmap) SEARCHES FP AND SAVES BINARY TO CONTENT TO HASHMAP FOR UNIQUE PARSING.
+    // TODO: CREATE FUNCTION TO FIT INSIDE (SaveFilesToHashmap) (SaveBinaryContentToHashmap) TO PRINT AND SAVE OUTUT
     SaveFilesToHashmap(folderPath, &fileMap);
+    SaveBinaryContentToHashmap(folderPath, &fileBinary)
+
 
     // Collect file names into an array for CUDA processing
     int numFiles = HASH_COUNT(fileMap);
@@ -157,7 +165,7 @@ void PrintFilesToFile(const char* folderPath, const char* outputFilePath) {
     fclose(outputFile);
 }
 
-void SaveFilesToHashmap(const char* folderPath, FileEntry** fileMap) {
+void SaveFilesToHashmap(const char* folderPath, FileEntry** fileBinary) {
     WIN32_FIND_DATA findFileData;
     HANDLE hFind = INVALID_HANDLE_VALUE;
 
@@ -227,6 +235,51 @@ void CheckDuplicatesInHashmap(FileEntry* fileMap) {
     FreeHashmap(duplicateMap);
 }
 
+void SaveBinaryContentToHashmap(const char* folderPath, FileEntry** fileMap) {
+    WIN32_FIND_DATA findFileData;
+    HANDLE hFind = INVALID_HANDLE_VALUE;
+
+    // Create the search pattern
+    char searchPattern[MAX_PATH];
+    snprintf(searchPattern, MAX_PATH, "%s\\*.*", folderPath);
+
+    // Find the first file in the directory
+    hFind = FindFirstFile(searchPattern, &findFileData);
+
+    if (hFind == INVALID_HANDLE_VALUE) {
+        printf("Error: Unable to open directory %s\n", folderPath);
+        return;
+    }
+
+    do {
+        const char* fileName = findFileData.cFileName;
+        if (strcmp(fileName, ".") != 0 && strcmp(fileName, "..") != 0) {
+            char filePath[MAX_PATH];
+            snprintf(filePath, MAX_PATH, "%s\\%s", folderPath, fileName);
+
+            size_t contentSize;
+            unsigned char* content = ReadFileContent(filePath, &contentSize);
+            if (content == NULL) {
+                continue;
+            }
+
+            FileEntry* newEntry = (FileEntry*)malloc(sizeof(FileEntry));
+            if (newEntry == NULL) {
+                printf("Error: Memory allocation failed\n");
+                free(content);
+                FindClose(hFind);
+                return;
+            }
+
+            strncpy(newEntry->fileName, fileName, MAX_PATH);
+            newEntry->content = content;
+            newEntry->contentSize = contentSize;
+            HASH_ADD_STR(*fileMap, fileName, newEntry);
+        }
+    } while (FindNextFile(hFind, &findFileData) != 0);
+
+    FindClose(hFind);
+}
 void FreeHashmap(FileEntry* fileMap) {
     FileEntry* currentFile;
     FileEntry* tmp;
