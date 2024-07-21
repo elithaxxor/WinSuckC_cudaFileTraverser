@@ -1,0 +1,75 @@
+1.	FileEntry Structure:
+
+	•	fileName is the key.
+
+	•	UT_hash_handle hh makes the structure hashable.
+
+	2.	SaveFilesToHashmap Function:
+
+	•	This function takes the folder path and a pointer to the fileMap.
+
+	•	It iterates over files in the specified directory and adds each filename to the hashmap.
+
+	3.	FreeHashmap Function:
+
+	•	This function frees the memory allocated for the hashmap.
+
+	4.	Integration in main:
+
+	•	The SaveFilesToHashmap function is called to save filenames to the hashmap.
+
+	•	The contents of the hashmap are printed.
+
+	•	The FreeHashmap function is called to free the memory allocated for the hashmap.
+
+
+
+
+
+
+CheckDuplicatesInHashmap Function:
+
+	•	This function iterates through the fileMap and checks for duplicates using a secondary hashmap (duplicateMap).
+
+	•	If a duplicate is found, it is printed.
+
+	•	If no duplicates are found, it prints a message indicating this.
+
+	•	The duplicateMap is freed at the end of the function to release allocated memory.
+
+
+
+
+
+	1.	Write a function to read the binary content of each file.
+
+	2.	Write a function to save the binary contents in a hashmap.
+
+	3.	Write a CUDA kernel to compare the binary contents of the files to find duplicates.
+
+	4.	Integrate these functionalities into a complete program.
+
+
+
+Step 1: Reading Binary Content of Each File
+
+
+
+We’ll write a function to read the binary content of a file.
+
+
+
+Step 2: Saving Binary Contents in a Hashmap
+
+
+
+We’ll write a function to save the binary contents in a hashmap.
+
+
+
+Step 3: CUDA Kernel to Compare Binary Contents
+
+
+
+We’ll write a CUDA kernel to compare the binary contents of the files.
+
